@@ -1,0 +1,135 @@
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace yazyapp
+{
+    public class GorevlerDal
+    {
+        SqlConnection _connection = new SqlConnection(@"Data Source=LAPTOP-EEH670R0\AYSENURC;Initial Catalog=yazyapp;Integrated Security=True");
+        private void ConnectionControl()
+        {
+            if (_connection.State == ConnectionState.Closed)
+            {
+                _connection.Open();
+            }
+        }
+
+        public void GorevEkle(Gorev gorev)
+        {
+            SqlCommand command = new SqlCommand("INSERT INTO Gorevler_tbl (uye_id, aciklama, tarih, onemli_mi) VALUES (@UyeID, @Aciklama, @Tarih, @OnemliMi)", _connection);
+    
+        // Parametreleri ekleme
+            command.Parameters.AddWithValue("@UyeID", gorev.Uye_id);
+            command.Parameters.AddWithValue("@Aciklama", gorev.Aciklama);
+            command.Parameters.AddWithValue("@Tarih", gorev.Tarih);
+            command.Parameters.AddWithValue("@OnemliMi", gorev.Onemli_mi);
+
+            // Bağlantıyı açma
+            ConnectionControl();
+
+            // Sorguyu çalıştırma
+            int rowsAffected = command.ExecuteNonQuery();
+
+            // İşlem sonucunu kontrol etme
+            if (rowsAffected > 0)
+            {
+               // MessageBox.Show("Görev eklendi.");
+            }
+            else
+            {
+                //MessageBox.Show("Görev eklenirken bir hata oluştu.");
+            }
+
+        }
+        public void GorevTamamla(Gorev gorev)
+        {
+            SqlCommand command = new SqlCommand("DELETE FROM Gorevler WHERE gorev_id = @GorevID", _connection);
+            // Parametreleri ekleme
+            command.Parameters.AddWithValue("@GorevID", gorev.Gorev_id);
+
+            // Bağlantıyı açma
+            ConnectionControl();
+
+            // Sorguyu çalıştırma
+            int rowsAffected = command.ExecuteNonQuery();
+
+            // İşlem sonucunu kontrol etme
+            if (rowsAffected > 0)
+            {
+                //MessageBox.Show("Görev silindi.");
+            }
+            else
+            {
+                //MessageBox.Show("Görev silinirken bir hata oluştu.");
+            }
+            //eğer silinmediyse mesaj göster
+        }
+        public void GorevGuncelle(Gorev gorev)
+        {
+            SqlCommand command = new SqlCommand("UPDATE Gorevler SET onemli_mi = @OnemliMi WHERE gorev_id = @GorevID", _connection);
+
+            //"UPDATE Gorevler SET uye_id = @UyeID, aciklama = @Aciklama, tarih = @Tarih, onemli_mi = @OnemliMi WHERE gorev_id = @GorevID" hepsi için update
+
+            // Parametreleri ekleme
+            command.Parameters.AddWithValue("@GorevID", gorev.Gorev_id);
+            command.Parameters.AddWithValue("@OnemliMi", gorev.Onemli_mi);
+            //hepsi için 
+            /*command.Parameters.AddWithValue("@GorevID", gorev_id);
+            command.Parameters.AddWithValue("@UyeID", uye_id);
+            command.Parameters.AddWithValue("@Aciklama", txtAciklama.Text);
+            command.Parameters.AddWithValue("@Tarih", dtTarih.Value);
+            command.Parameters.AddWithValue("@OnemliMi", chkOnemliMi.Checked);*/
+
+            // Bağlantıyı açma
+            ConnectionControl();
+
+        // Sorguyu çalıştırma
+            int rowsAffected = command.ExecuteNonQuery();
+
+            // İşlem sonucunu kontrol etme
+            if (rowsAffected > 0)
+            {
+                //MessageBox.Show("Görev güncellendi.");
+            }
+            else
+            {
+                //MessageBox.Show("Görev güncellenirken bir hata oluştu.");
+            }
+        }
+        public List<Gorev> GorevlerListele(Gorev gorev)
+        {
+            SqlCommand command = new SqlCommand("SELECT * FROM Gorevler WHERE uye_id = @uyeID", _connection);
+
+            // Liste oluşturma
+            List<Gorev> gorevler = new List<Gorev>();
+
+            // Parametre ekleme
+            command.Parameters.AddWithValue("@uyeID", gorev.Uye_id);
+
+            // Bağlantıyı açma
+            ConnectionControl();
+            // Verileri okuma
+            using (SqlDataReader reader = command.ExecuteReader())
+            {
+                // Liste doldurma
+                while (reader.Read())
+                {
+                    Gorev gorevim = new Gorev {
+                    Gorev_id = reader.GetInt32(0),
+                    Uye_id= reader.GetInt32(1),
+                    Aciklama = reader.GetString(2),
+                    Tarih= reader.GetDateTime(3),
+                    Onemli_mi= reader.GetBoolean(4)
+                    };
+                    gorevler.Add(gorevim);
+                }
+            }
+            return gorevler;
+        }
+    }
+}
