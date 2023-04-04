@@ -1,0 +1,18 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace yazyapp
+{
+    public class Gorev
+    {
+        public int Gorev_id { get; set; }
+        public int Uye_id { get; set; }
+        public string Aciklama { get; set; }
+        public DateTime Tarih { get; set; }
+        public bool Onemli_mi { get; set; }
+
+    }
+}
