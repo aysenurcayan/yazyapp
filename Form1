@@ -1,0 +1,91 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+
+namespace yazyapp
+{
+    public partial class Form1 : Form
+    {
+        private int uyeId;
+
+        public Form1(int id)
+        {
+          
+            InitializeComponent();
+            this.uyeId = id;
+        }
+
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            GorevlerDal gorevlerDal = new GorevlerDal();
+        gorevlerDal.GorevEkle(
+            new Gorev
+            {
+                Aciklama = richTextBox1.Text,
+                Uye_id = uyeId,
+                Tarih=dateTimePicker1.Value,
+                Gorev_id=0,
+                Onemli_mi=checkBox1.Checked
+            }
+            ) ;
+            checkedListBox1.Items.Add(richTextBox1.Text);
+
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+            dateTimePicker1.Format = DateTimePickerFormat.Custom;
+            // Display the date as "Mon 27 Feb 2012".  
+            //dateTimePicker1.CustomFormat = "ddd dd MMM yyyy";
+            dateTimePicker1.CustomFormat = "'Bugün: 'ddMMMM-dddd";
+
+            this.BackgroundImageLayout = ImageLayout.Stretch;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            
+            
+            if (checkBox1.Checked)
+            {
+                // Seçili öğeleri döngüyle tarayın
+                for (int i = 0; i < checkedListBox1.CheckedItems.Count; i++)
+                {
+                    // Seçilen öğenin metnini alın
+                    string itemText = checkedListBox1.CheckedItems[i].ToString();
+
+                    // Metne eklemek istediğiniz yeni metni oluşturun
+                    string newText = itemText + " !!! ÖNEMLİ ";
+
+                    // Seçili öğenin dizinini alın
+                    int index = checkedListBox1.Items.IndexOf(checkedListBox1.CheckedItems[i]);
+
+                    // Yeni metni seçili öğenin yerine yazın
+                    checkedListBox1.Items[index] = newText;
+                }
+            }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            // Silme işlemi için önce seçilen öğeleri bulalım
+            for (int i = checkedListBox1.CheckedItems.Count - 1; i >= 0; i--)
+            {
+                // Seçili öğenin dizinini alın
+                int index = checkedListBox1.Items.IndexOf(checkedListBox1.CheckedItems[i]);
+
+                // Öğeyi listeden kaldırın
+                checkedListBox1.Items.RemoveAt(index);
+            }
+            
+        }
+    }
+}
